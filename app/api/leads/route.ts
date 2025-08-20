@@ -34,40 +34,54 @@ async function sendNotificationEmail(leadData: any) {
   const resendApiKey = process.env.RESEND_API_KEY
   const adminEmail = process.env.ADMIN_EMAIL
   
+  console.log('Email attempt - API Key exists:', !!resendApiKey, 'Admin Email exists:', !!adminEmail)
+  
   if (!resendApiKey || !adminEmail) {
+    console.log('Missing email configuration')
     return false
   }
   
   try {
+    const emailPayload = {
+      from: 'Curbside Cans <onboarding@resend.dev>',
+      to: [adminEmail],
+      subject: 'New Lead - Curbside Cans Valet',
+      html: `
+        <h2>New Lead Submission</h2>
+        <p><strong>Name:</strong> ${leadData.fullName}</p>
+        <p><strong>Email:</strong> ${leadData.email}</p>
+        <p><strong>Phone:</strong> ${leadData.phone || 'Not provided'}</p>
+        <p><strong>Address:</strong> ${leadData.address}</p>
+        <p><strong>Notes:</strong> ${leadData.notes || 'None'}</p>
+        <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
+      `
+    }
+    
+    console.log('Sending email to:', adminEmail)
+    
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${resendApiKey}`
       },
-      body: JSON.stringify({
-        from: 'Curbside Cans <onboarding@resend.dev>',
-        to: [adminEmail],
-        subject: 'New Lead - Curbside Cans Valet',
-        html: `
-          <h2>New Lead Submission</h2>
-          <p><strong>Name:</strong> ${leadData.fullName}</p>
-          <p><strong>Email:</strong> ${leadData.email}</p>
-          <p><strong>Phone:</strong> ${leadData.phone || 'Not provided'}</p>
-          <p><strong>Address:</strong> ${leadData.address}</p>
-          <p><strong>Notes:</strong> ${leadData.notes || 'None'}</p>
-          <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
-        `
-      })
+      body: JSON.stringify(emailPayload)
     })
     
+    console.log('Resend response status:', response.status)
+    
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Resend API error:', response.status, errorText)
       return false
     }
     
+    const result = await response.json()
+    console.log('Email sent successfully:', result.id)
     return true
+    
   } catch (error) {
-    console.error('Failed to send email:', error)
+    console.error('Email sending failed:', error)
     return false
   }
 }
@@ -153,17 +167,24 @@ export async function POST(request: NextRequest) {
     // Validate with Zod
     const validatedData = leadFormSchema.parse(sanitizedData)
     
-    // Save to file
-    const saved = await saveToFile(validatedData)
+    // Try to save to file (only works locally)
+    try {
+      await saveToFile(validatedData)
+    } catch (error) {
+      // File system is read-only on Vercel, this is expected
+    }
     
-    // Send email notification (optional)
+    // Send email notification (this is what we rely on in production)
     const emailSent = await sendNotificationEmail(validatedData)
     
-    if (!saved && !emailSent) {
-      // In production on Vercel, file system is read-only
-      // So just log it and return success
-      console.log('New lead (file save failed, logging only):', validatedData)
-    }
+    // Always log the lead for debugging
+    console.log('New lead submission:', {
+      name: validatedData.fullName,
+      email: validatedData.email,
+      address: validatedData.address,
+      timestamp: new Date().toISOString(),
+      emailSent
+    })
     
     return NextResponse.json({ 
       ok: true,
