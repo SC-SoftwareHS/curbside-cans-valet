@@ -30,7 +30,7 @@ export default function AboutPage() {
 
       <Section className="bg-slate-50">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             <div>
               <h2 className="text-3xl font-bold text-slate-900 mb-6">
                 Our Story
@@ -73,8 +73,8 @@ export default function AboutPage() {
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                     <Users className="h-8 w-8 text-green-600" />
                   </div>
-                  <div className="text-2xl font-bold text-slate-900">Many</div>
-                  <div className="text-sm text-slate-600">Happy Families</div>
+                  <div className="text-2xl font-bold text-slate-900">Local</div>
+                  <div className="text-sm text-slate-600">Neighborhood</div>
                 </div>
                 <div className="text-center">
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -94,7 +94,7 @@ export default function AboutPage() {
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                     <Heart className="h-8 w-8 text-green-600" />
                   </div>
-                  <div className="text-2xl font-bold text-slate-900">2</div>
+                  <div className="text-2xl font-bold text-slate-900">3</div>
                   <div className="text-sm text-slate-600">Years Running</div>
                 </div>
               </div>

@@ -83,7 +83,7 @@ export function Hero() {
                   {/* Stats */}
                   <div className="mt-4 grid grid-cols-2 gap-4 text-center">
                     <div className="bg-white/80 rounded-lg p-3">
-                      <div className="text-lg font-bold text-green-600">2 Years</div>
+                      <div className="text-lg font-bold text-green-600">3 Years</div>
                       <div className="text-xs text-slate-600">In Business</div>
                     </div>
                     <div className="bg-white/80 rounded-lg p-3">
@@ -113,7 +113,7 @@ export function Hero() {
               </div>
               <div className="flex items-center">
                 <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                <span>2+ years in business</span>
+                <span>3+ years in business</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
