@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
       try {
         await saveToFile(validatedData)
       } catch (error) {
-        console.log('File save failed (expected in production):', error.message)
+        console.log('File save failed (expected in production):', error instanceof Error ? error.message : 'Unknown error')
       }
     }
     
