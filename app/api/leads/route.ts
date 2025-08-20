@@ -168,10 +168,12 @@ export async function POST(request: NextRequest) {
     const validatedData = leadFormSchema.parse(sanitizedData)
     
     // Try to save to file (only works locally)
-    try {
-      await saveToFile(validatedData)
-    } catch (error) {
-      // File system is read-only on Vercel, this is expected
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        await saveToFile(validatedData)
+      } catch (error) {
+        console.log('File save failed (expected in production):', error.message)
+      }
     }
     
     // Send email notification (this is what we rely on in production)
