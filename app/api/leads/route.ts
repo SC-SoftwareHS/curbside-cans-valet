@@ -142,6 +142,9 @@ async function saveToFile(leadData: any) {
 }
 
 export async function POST(request: NextRequest) {
+  console.log('=== LEAD SUBMISSION STARTED ===')
+  console.log('Request received at:', new Date().toISOString())
+  
   try {
     // Rate limiting
     const rateLimitKey = getRateLimitKey(request)
@@ -210,15 +213,16 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET endpoint to retrieve leads (for local development)
-export async function GET(request: NextRequest) {
-  try {
-    const filePath = path.join(process.cwd(), 'data', 'leads.json')
-    const fileContent = await fs.readFile(filePath, 'utf-8')
-    const leads = JSON.parse(fileContent)
-    
-    return NextResponse.json({ leads })
-  } catch (error) {
-    return NextResponse.json({ leads: [], message: 'No leads yet' })
-  }
+// GET endpoint to test API functionality
+export async function GET() {
+  console.log('=== API GET TEST ===')
+  return NextResponse.json({ 
+    status: 'API is working',
+    timestamp: new Date().toISOString(),
+    env: {
+      hasResendKey: !!process.env.RESEND_API_KEY,
+      hasAdminEmail: !!process.env.ADMIN_EMAIL,
+      adminEmail: process.env.ADMIN_EMAIL
+    }
+  })
 }
