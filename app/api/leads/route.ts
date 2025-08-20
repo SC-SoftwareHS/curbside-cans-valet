@@ -34,19 +34,11 @@ async function sendNotificationEmail(leadData: any) {
   const resendApiKey = process.env.RESEND_API_KEY
   const adminEmail = process.env.ADMIN_EMAIL
   
-  console.log('Email config check:', {
-    hasApiKey: !!resendApiKey,
-    hasAdminEmail: !!adminEmail,
-    adminEmail: adminEmail
-  })
-  
   if (!resendApiKey || !adminEmail) {
-    console.log('Resend not configured, skipping email notification')
     return false
   }
   
   try {
-    console.log('Attempting to send email...')
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -69,16 +61,10 @@ async function sendNotificationEmail(leadData: any) {
       })
     })
     
-    console.log('Email response status:', response.status)
-    
     if (!response.ok) {
-      const error = await response.text()
-      console.error('Resend error:', error)
       return false
     }
     
-    const result = await response.json()
-    console.log('Email sent successfully:', result)
     return true
   } catch (error) {
     console.error('Failed to send email:', error)
