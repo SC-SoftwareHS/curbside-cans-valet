@@ -34,51 +34,34 @@ async function sendNotificationEmail(leadData: any) {
   const resendApiKey = process.env.RESEND_API_KEY
   const adminEmail = process.env.ADMIN_EMAIL
   
-  console.log('Email attempt - API Key exists:', !!resendApiKey, 'Admin Email exists:', !!adminEmail)
-  
   if (!resendApiKey || !adminEmail) {
-    console.log('Missing email configuration')
     return false
   }
   
   try {
-    const emailPayload = {
-      from: 'Curbside Cans <onboarding@resend.dev>',
-      to: [adminEmail],
-      subject: 'New Lead - Curbside Cans Valet',
-      html: `
-        <h2>New Lead Submission</h2>
-        <p><strong>Name:</strong> ${leadData.fullName}</p>
-        <p><strong>Email:</strong> ${leadData.email}</p>
-        <p><strong>Phone:</strong> ${leadData.phone || 'Not provided'}</p>
-        <p><strong>Address:</strong> ${leadData.address}</p>
-        <p><strong>Notes:</strong> ${leadData.notes || 'None'}</p>
-        <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
-      `
-    }
-    
-    console.log('Sending email to:', adminEmail)
-    
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${resendApiKey}`
       },
-      body: JSON.stringify(emailPayload)
+      body: JSON.stringify({
+        from: 'Curbside Cans <noreply@curbsidecansvalet.com>',
+        to: [adminEmail],
+        subject: 'New Lead - Curbside Cans Valet',
+        html: `
+          <h2>New Lead Submission</h2>
+          <p><strong>Name:</strong> ${leadData.fullName}</p>
+          <p><strong>Email:</strong> ${leadData.email}</p>
+          <p><strong>Phone:</strong> ${leadData.phone || 'Not provided'}</p>
+          <p><strong>Address:</strong> ${leadData.address}</p>
+          <p><strong>Notes:</strong> ${leadData.notes || 'None'}</p>
+          <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
+        `
+      })
     })
     
-    console.log('Resend response status:', response.status)
-    
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Resend API error:', response.status, errorText)
-      return false
-    }
-    
-    const result = await response.json()
-    console.log('Email sent successfully:', result.id)
-    return true
+    return response.ok
     
   } catch (error) {
     console.error('Email sending failed:', error)
@@ -142,9 +125,6 @@ async function saveToFile(leadData: any) {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('=== LEAD SUBMISSION STARTED ===')
-  console.log('Request received at:', new Date().toISOString())
-  
   try {
     // Rate limiting
     const rateLimitKey = getRateLimitKey(request)
@@ -180,16 +160,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Send email notification (this is what we rely on in production)
-    const emailSent = await sendNotificationEmail(validatedData)
-    
-    // Always log the lead for debugging
-    console.log('New lead submission:', {
-      name: validatedData.fullName,
-      email: validatedData.email,
-      address: validatedData.address,
-      timestamp: new Date().toISOString(),
-      emailSent
-    })
+    await sendNotificationEmail(validatedData)
     
     return NextResponse.json({ 
       ok: true,
