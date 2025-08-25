@@ -61,7 +61,7 @@ export default function HomePage() {
           "@type": "Offer",
           "itemOffered": {
             "@type": "Service",
-            "name": "Basic Plan - 2 Cans Weekly",
+            "name": "Basic Plan - 3 Cans Weekly",
             "description": "Weekly trash and recycling bin service"
           },
           "price": "29",

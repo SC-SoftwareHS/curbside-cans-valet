@@ -10,7 +10,7 @@ const plans = [
     price: 29,
     description: 'Perfect for standard households',
     features: [
-      '2 cans (trash & recycle)',
+      '3 cans (trash & recycle)',
       'Weekly service',
       'Rain or shine service',
       'Professional service',
